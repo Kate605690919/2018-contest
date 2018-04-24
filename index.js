@@ -48,15 +48,15 @@ class Game {
             }
         }, 200))
         // 移动端
-        document.addEventListener("touchstart", function (event) {
+        boxEl.addEventListener("touchstart", function (event) {
             event.preventDefault()
             that.startX = event.touches[0].pageX
             that.startY = event.touches[0].pageY
         })
-        document.body.addEventListener("touchmove", function (event) {
+        boxEl.addEventListener("touchmove", function (event) {
             event.preventDefault()
         })
-        document.addEventListener("touchend", function (event) {
+        boxEl.addEventListener("touchend", function (event) {
             const endX = event.changedTouches[0].pageX;
             const endY = event.changedTouches[0].pageY;
 
