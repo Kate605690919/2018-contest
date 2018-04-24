@@ -52,7 +52,9 @@ class Game {
             that.startX = event.touches[0].pageX
             that.startY = event.touches[0].pageY
         })
-
+        document.addEventListener("touchmove", function (event) {
+            event.preventDefault()
+        })
         document.addEventListener("touchend", function (event) {
             const endX = event.changedTouches[0].pageX;
             const endY = event.changedTouches[0].pageY;
