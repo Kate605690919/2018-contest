@@ -27,26 +27,26 @@ class Game {
                 // 左移
                 case 37:
                     that.moveLeft()
-                    setTimeout(that.render.bind(that), 100)
+                    setTimeout(that.render.bind(that), 200)
                     break
                 // 上移
                 case 38:
                     that.moveUp()
-                    setTimeout(that.render.bind(that), 100)
+                    setTimeout(that.render.bind(that), 200)
                     break
                 // 右移
                 case 39:
                     that.moveRight()
-                    setTimeout(that.render.bind(that), 100)
+                    setTimeout(that.render.bind(that), 200)
                     break
                 // 下移    
                 case 40:
                     that.moveDown()
-                    setTimeout(that.render.bind(that), 100)
+                    setTimeout(that.render.bind(that), 200)
                     break
                 default: break
             }
-        }, 100))
+        }, 200))
         // 移动端
         document.addEventListener("touchstart", function (event) {
             that.startX = event.touches[0].pageX
@@ -65,18 +65,18 @@ class Game {
             if (Math.abs(subtractX) >= Math.abs(subtractY)) {
                 if (subtractX > 0) {
                     that.moveRight()
-                    setTimeout(that.render.bind(that), 100)
+                    setTimeout(that.render.bind(that), 200)
                 } else {
                     that.moveLeft()
-                    setTimeout(that.render.bind(that), 100)
+                    setTimeout(that.render.bind(that), 200)
                 }
             } else {
                 if (subtractY > 0) {
                     that.moveDown()
-                    setTimeout(that.render.bind(that), 100)
+                    setTimeout(that.render.bind(that), 200)
                 } else {
                     that.moveUp()
-                    setTimeout(that.render.bind(that), 100)
+                    setTimeout(that.render.bind(that), 200)
                 }
             }
         });
