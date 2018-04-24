@@ -49,6 +49,7 @@ class Game {
         }, 200))
         // 移动端
         document.addEventListener("touchstart", function (event) {
+            event.preventDefault()
             that.startX = event.touches[0].pageX
             that.startY = event.touches[0].pageY
         })
