@@ -129,7 +129,7 @@ class Game {
         const newNumArr = that.cacheNumArr
         // const compareR = that.compare(OldNumArr, newNumArr)
         // if (!compareR && !init) return
-        if (that.haveChange && !init) {
+        // if (that.haveChange && !init) {
             // 根据新的渲染节点
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
@@ -167,7 +167,7 @@ class Game {
                 }
             }
             that.once = 'init'
-        }
+        //}
 
         // 更新NumArr
         // that.NumArr = that.deepCopy(newNumArr)
