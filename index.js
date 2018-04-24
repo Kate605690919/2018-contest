@@ -1,9 +1,10 @@
+// 防止点击和移动在render完成之前再次发生
 let throttle = function (fn, delay) {
     let timer = null;
 
     return function (e) {
         clearTimeout(timer);
-        timer = setTimeout(function() {
+        timer = setTimeout(function () {
             fn(e);
         }, delay);
     }
@@ -17,6 +18,7 @@ class Game {
         // this.score = 0
         this.scoreEl = document.querySelector('#score')
         this.mostScoreEl = document.querySelector('#mostScore')
+        this.haveChange = false
         // 注册事件
         const boxEl = document.querySelector('#box')
         let boxWidth = this.getStyle(boxEl, 'width')
@@ -49,6 +51,7 @@ class Game {
         }, 200))
         // 移动端
         boxEl.addEventListener("touchstart", function (event) {
+            // 阻止移动端屏幕向下滑动
             event.preventDefault()
             that.startX = event.touches[0].pageX
             that.startY = event.touches[0].pageY
@@ -89,11 +92,12 @@ class Game {
                 that.init()
             }
         })
-        document.querySelector('#cheat').addEventListener('click', function(e) {
-            alert('嘻嘻嘻嘻，上当了吧，老老实实自己玩去')
+        document.querySelector('#cheat').addEventListener('click', function (e) {
+            alert('嘻嘻嘻嘻，老老实实自己玩去')
         })
         this.init()
     }
+
     // 清空状态等等
     init() {
         this.NumArr = []
@@ -125,44 +129,46 @@ class Game {
         const newNumArr = that.cacheNumArr
         // const compareR = that.compare(OldNumArr, newNumArr)
         // if (!compareR && !init) return
-
-        // 根据新的渲染节点
-        for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 4; j++) {
-                if (OldNumArr[i][j].value === 2048) {
-                    if(alert('恭喜完成挑战！')) {
-                        that.init()
-                        return
-                    }
-                }
-                if (that.once === null) {
-                    that.ceils[i * 4 + j].style.width = `${that.ceilWidth}px`
-                    that.ceils[i * 4 + j].style.height = `${that.ceilWidth}px`
-                    that.ceils[i * 4 + j].style.top = `${i * (that.ceilWidth + 8) + 4}px`
-                    that.ceils[i * 4 + j].style.left = `${j * (that.ceilWidth + 8) + 4}px`
-                }
-                // 不一样的再更新
-                // if (compareR[i][j] === 'change') {
-                if (OldNumArr[i][j].value) {
-                    if (OldNumArr[i][j].double) {
-                        that.ceils[i * 4 + j].innerHTML = `<div class="ceil-${OldNumArr[i][j].value}" style="left: 0;top: 0;transform:scale(1.1);line-height:${that.ceilWidth}px">${OldNumArr[i][j].value}</div>`
-                        this.scaleAnimation(i, j, 200)
-                        that.score += OldNumArr[i][j].value
-                        that.scoreEl.innerHTML = that.score
-                        if (that.score > that.historyScore) {
-                            localStorage.setItem('mostScore', that.score)
-                            that.mostScoreEl.innerHTML = that.score
+        if (that.haveChange && !init) {
+            // 根据新的渲染节点
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (OldNumArr[i][j].value === 2048) {
+                        if (alert('恭喜完成挑战！')) {
+                            that.init()
+                            return
                         }
-                    } else
-                        that.ceils[i * 4 + j].innerHTML = `<div class="ceil-${OldNumArr[i][j].value}" style="left: 0;top: 0;transform:scale(1.0);line-height:${that.ceilWidth}px">${OldNumArr[i][j].value}</div>`
-                } else {
-                    that.ceils[i * 4 + j].innerHTML = ''
+                    }
+                    if (that.once === null) {
+                        that.ceils[i * 4 + j].style.width = `${that.ceilWidth}px`
+                        that.ceils[i * 4 + j].style.height = `${that.ceilWidth}px`
+                        that.ceils[i * 4 + j].style.top = `${i * (that.ceilWidth + 8) + 4}px`
+                        that.ceils[i * 4 + j].style.left = `${j * (that.ceilWidth + 8) + 4}px`
+                    }
+                    // 不一样的再更新
+                    // if (compareR[i][j] === 'change') {
+                    if (OldNumArr[i][j].value) {
+                        if (OldNumArr[i][j].double) {
+                            that.ceils[i * 4 + j].innerHTML = `<div class="ceil-${OldNumArr[i][j].value}" style="left: 0;top: 0;transform:scale(1.1);line-height:${that.ceilWidth}px">${OldNumArr[i][j].value}</div>`
+                            this.scaleAnimation(i, j, 2000)
+                            that.score += OldNumArr[i][j].value
+                            that.scoreEl.innerHTML = that.score
+                            if (that.score > that.historyScore) {
+                                localStorage.setItem('mostScore', that.score)
+                                that.mostScoreEl.innerHTML = that.score
+                            }
+                        } else
+                            that.ceils[i * 4 + j].innerHTML = `<div class="ceil-${OldNumArr[i][j].value}" style="left: 0;top: 0;transform:scale(1.0);line-height:${that.ceilWidth}px">${OldNumArr[i][j].value}</div>`
+                    } else {
+                        that.ceils[i * 4 + j].innerHTML = ''
+                    }
+                    // }
+                    OldNumArr[i][j].double = false
                 }
-                // }
-                OldNumArr[i][j].double = false
             }
+            that.once = 'init'
         }
-        that.once = 'init'
+
         // 更新NumArr
         // that.NumArr = that.deepCopy(newNumArr)
 
@@ -171,7 +177,7 @@ class Game {
         if (!that.gameOver()) {
             if (localStorage.getItem('mostScore') < that.score)
                 localStorage.setItem('mostScore', that.score)
-            setTimeout(function() {
+            setTimeout(function () {
                 if (confirm('Game Over!')) {
                     that.init()
                 }
@@ -209,9 +215,10 @@ class Game {
                     NumArr[firstZero[0]][firstZero[1]].value = NumArr[i][j].value
                     NumArr[i][j].value = 0
                     // 如果相同，合并设0
-                    if (firstZero[1] !== 0 && NumArr[firstZero[0]][firstZero[1]].value === NumArr[firstZero[0]][firstZero[1] - 1].value) {
+                    if (!NumArr[firstZero[0]][firstZero[1] - 1].double && firstZero[1] !== 0 && NumArr[firstZero[0]][firstZero[1]].value === NumArr[firstZero[0]][firstZero[1] - 1].value) {
                         NumArr[firstZero[0]][firstZero[1] - 1] = { value: NumArr[firstZero[0]][firstZero[1]].value << 1, changed: true, double: true }
                         NumArr[firstZero[0]][firstZero[1]].value = 0
+                        this.haveChange = true
                         // 移动动画效果
                         this.translateAnimation(i, j, firstZero[0], firstZero[1] - 1)
                     } else {
@@ -222,11 +229,12 @@ class Game {
                         firstZero = null
                     }
                 }
-                else if (firstZero === null && NumArr[i][j].value !== 0 && j !== 0 && NumArr[i][j].value === NumArr[i][j - 1].value) {
+                else if (!NumArr[i][j - 1].double && firstZero === null && NumArr[i][j].value !== 0 && j !== 0 && NumArr[i][j].value === NumArr[i][j - 1].value) {
                     // 判断相等累加合并
                     NumArr[i][j - 1] = { value: NumArr[i][j - 1].value << 1, changed: true, double: true }
                     NumArr[i][j].value = 0
 
+                    this.haveChange = true
                     // 移动动画效果
                     this.translateAnimation(i, j, i, j - 1)
 
@@ -250,11 +258,12 @@ class Game {
                     NumArr[firstZero[0]][firstZero[1]].value = NumArr[i][j].value
                     NumArr[i][j].value = 0
                     // 如果相同，合并设0
-                    if (firstZero[1] !== 3 && NumArr[firstZero[0]][firstZero[1]].value === NumArr[firstZero[0]][firstZero[1] + 1].value) {
+                    if (!NumArr[firstZero[0]][firstZero[1] + 1].double && firstZero[1] !== 3 && NumArr[firstZero[0]][firstZero[1]].value === NumArr[firstZero[0]][firstZero[1] + 1].value) {
                         NumArr[firstZero[0]][firstZero[1] + 1].value = NumArr[firstZero[0]][firstZero[1]].value << 1
                         NumArr[firstZero[0]][firstZero[1] + 1].double = true
                         NumArr[firstZero[0]][firstZero[1]].value = 0
                         // 移动动画效果
+                        this.haveChange = true
                         this.translateAnimation(i, j, firstZero[0], firstZero[1] + 1)
                     } else {
                         // 移动动画效果
@@ -264,13 +273,14 @@ class Game {
                         firstZero = null
                     }
                 }
-                else if (firstZero === null && NumArr[i][j].value !== 0 && j !== 3 && NumArr[i][j].value === NumArr[i][j + 1].value) {
+                else if (!NumArr[i][j + 1].double && firstZero === null && NumArr[i][j].value !== 0 && j !== 3 && NumArr[i][j].value === NumArr[i][j + 1].value) {
                     // 判断相等累加合并
                     NumArr[i][j + 1].value = NumArr[i][j + 1].value << 1
                     NumArr[i][j + 1].double = true
                     NumArr[i][j].value = 0
 
                     // 移动动画效果
+                    this.haveChange = true
                     this.translateAnimation(i, j, i, j + 1)
                     firstZero = [i, j]
                 }
@@ -293,10 +303,11 @@ class Game {
                     NumArr[i][j].value = 0
 
                     // 如果相同，合并设0
-                    if (firstZero[0] !== 3 && NumArr[firstZero[0]][firstZero[1]].value === NumArr[firstZero[0] + 1][firstZero[1]].value) {
+                    if (!NumArr[firstZero[0] + 1][firstZero[1]].double && firstZero[0] !== 3 && NumArr[firstZero[0]][firstZero[1]].value === NumArr[firstZero[0] + 1][firstZero[1]].value) {
                         NumArr[firstZero[0] + 1][firstZero[1]].value = NumArr[firstZero[0]][firstZero[1]].value << 1
                         NumArr[firstZero[0]][firstZero[1]].value = 0
                         NumArr[firstZero[0] + 1][firstZero[1]].double = true
+                        this.haveChange = true
                         // 移动动画效果
                         this.translateAnimation(i, j, firstZero[0] + 1, firstZero[1])
                     } else {
@@ -307,11 +318,12 @@ class Game {
                         firstZero = null
                     }
                 }
-                else if (firstZero === null && NumArr[i][j].value !== 0 && i !== 3 && NumArr[i][j].value === NumArr[i + 1][j].value) {
+                else if (!NumArr[i + 1][j].double && firstZero === null && NumArr[i][j].value !== 0 && i !== 3 && NumArr[i][j].value === NumArr[i + 1][j].value) {
                     // 判断相等累加合并
                     NumArr[i + 1][j].value = NumArr[i + 1][j].value << 1
                     NumArr[i + 1][j].double = true
                     NumArr[i][j].value = 0
+                    this.haveChange = true
                     // 移动动画效果
                     this.translateAnimation(i, j, i + 1, j)
                     firstZero = [i, j]
@@ -333,10 +345,11 @@ class Game {
                     NumArr[firstZero[0]][firstZero[1]].value = NumArr[i][j].value
                     NumArr[i][j].value = 0
                     // 如果相同，合并设0
-                    if (firstZero[0] !== 0 && NumArr[firstZero[0]][firstZero[1]].value === NumArr[firstZero[0] - 1][firstZero[1]].value) {
+                    if (!NumArr[firstZero[0] - 1][firstZero[1]].double && firstZero[0] !== 0 && NumArr[firstZero[0]][firstZero[1]].value === NumArr[firstZero[0] - 1][firstZero[1]].value) {
                         NumArr[firstZero[0] - 1][firstZero[1]].value = NumArr[firstZero[0]][firstZero[1]].value << 1
                         NumArr[firstZero[0] - 1][firstZero[1]].double = true
                         NumArr[firstZero[0]][firstZero[1]].value = 0
+                        this.haveChange = true
                         // 移动动画效果
                         this.translateAnimation(i, j, i - 1, j)
                     } else {
@@ -347,11 +360,12 @@ class Game {
                         firstZero = null
                     }
                 }
-                else if (firstZero === null && NumArr[i][j].value !== 0 && i !== 0 && NumArr[i][j].value === NumArr[i - 1][j].value) {
+                else if (!NumArr[i - 1][j].double && firstZero === null && NumArr[i][j].value !== 0 && i !== 0 && NumArr[i][j].value === NumArr[i - 1][j].value) {
                     // 判断相等累加合并
                     NumArr[i - 1][j].value = NumArr[i - 1][j].value << 1
                     NumArr[i - 1][j].double = true
                     NumArr[i][j].value = 0
+                    this.haveChange = true
                     // 移动动画效果
                     this.translateAnimation(i, j, i - 1, j)
                     firstZero = [i, j]
