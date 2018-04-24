@@ -171,11 +171,11 @@ class Game {
         if (!that.gameOver()) {
             if (localStorage.getItem('mostScore') < that.score)
                 localStorage.setItem('mostScore', that.score)
-            if (confirm('Game Over!')) {
-                that.init()
-            }
-
-
+            setTimeout(function() {
+                if (confirm('Game Over!')) {
+                    that.init()
+                }
+            }, 300)
         }
     }
     random(init) {
