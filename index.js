@@ -89,6 +89,9 @@ class Game {
                 that.init()
             }
         })
+        document.querySelector('#cheat').addEventListener('click', function(e) {
+            alert('嘻嘻嘻嘻，上当了吧，老老实实自己玩去')
+        })
         this.init()
     }
     // 清空状态等等
